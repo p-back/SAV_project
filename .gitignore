@@ -1,1 +1,4 @@
 Debug/
+*.lock
+bin/
+obj/
