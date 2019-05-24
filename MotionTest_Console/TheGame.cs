@@ -1,66 +1,133 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MotionTest_Console
+namespace BallInAMaze
 {
-    class TheGame
+    class TheGame : INotifyPropertyChanged
     {
-        public enum GameElements { Border, Empty, Hole };
-        //public char[] ConsoleSymbols = new char[] { '#', ' ', 'x' } { get; private set; }
-        public GameElements[,] PlayField { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public int BallPosition_W_X { get; private set; }
-        public int BallPosition_H_Y { get; private set; }
-
-        /// <summary>
-        /// CTOR
-        /// </summary>
-        /// <param name="PlayField_Width"></param>
-        /// <param name="PlayField_Height"></param>
-        public TheGame(int PlayField_Width, int PlayField_Height)
+        // --------------------------------------------------
+        //                  PROPERTIES
+        // --------------------------------------------------
+        public GameField.GameElements[,] TheGameField
         {
-            // Save dimensions and create PLAYFIELD
-            Width = PlayField_Width;
-            Height = PlayField_Height;
-            PlayField = new GameElements[PlayField_Width, PlayField_Height];
-
-            // Reset all fields to Empty blocks
-            for (int w = 0; w < Width; w++)
+            get { return Field.PlayField; }
+            set
             {
-                for (int h = 0; h < Height; h++)
+                if (!Equals(value, Field.PlayField))
                 {
-                    if ( (w == 0) || (h == 0) || (w == Width-1) || (h ==  Height-1) )
-                        PlayField[w, h] = GameElements.Border;
-                    else
-                        PlayField[w,h] = GameElements.Empty;
+                    Field.PlayField = value;
+                    OnPropertyChanged("TheGameField");
                 }
             }
-
-            // Reset BALL position
-            BallPosition_W_X = 1;
-            BallPosition_H_Y = 1;
-
-            //
         }
 
-        public void PrintPlayField_Console()
+        public int BallPosition_X
         {
-            // Reset all fields to Empty blocks
-            for (int w = 0; w < Width; w++)
+            get { return Field.BallPosition_X_W; }
+            set
             {
-                for (int h = 0; h < Height; h++)
+                if (value != Field.BallPosition_X_W)
                 {
-                    if ( (BallPosition_H_Y == h) && (BallPosition_W_X == w))
-                            Console.Write('*');
-                    else
-                        Console.Write(PlayField[w, h] == GameElements.Empty ? ' ' : '#');
+                    Field.BallPosition_X_W = value;
+                    OnPropertyChanged("BallPosition_X");
                 }
-                Console.WriteLine();
             }
+        }
+        public int BallPosition_Y
+        {
+            get { return Field.BallPosition_Y_H; }
+            set
+            {
+                if (value != Field.BallPosition_Y_H)
+                {
+                    Field.BallPosition_Y_H = value;
+                    OnPropertyChanged("BallPosition_Y");
+                }
+            }
+        }
+
+        public MotionData Data { get => data; private set => data = value; }
+        public GameField Field { get => field; private set => field = value; }
+
+        // --------------------------------------------------
+        //                  EVENTS
+        // --------------------------------------------------
+        public event EventHandler BallIsInHole;
+        public event EventHandler BallIsInFinish;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // --------------------------------------------------
+        //                  MEMBERS
+        // --------------------------------------------------
+
+        // Old values from motion board to be able to calculate difference in movement
+        private int Old_Value_X = 0;
+        private int Old_Value_Y = 0;
+
+        private GameField field;
+        private MotionData data;
+
+        // --------------------------------------------------
+        //                      CTOR
+        // --------------------------------------------------
+        public TheGame(int GameField_Width, int GameField_Height, int PortNumber)
+        {
+            field = new GameField(GameField_Width, GameField_Height);
+            data = new MotionData(PortNumber);
+            data.NewDataAvailable   += Data_NewDataArrived;
+            data.StartUpFailed      += Data_StartUpFailed;
+            data.DataError          += Data_DataError;
+        }
+
+        // --------------------------------------------------
+        //              IMPLEMENTED EVENTS
+        // --------------------------------------------------
+        private void Data_DataError(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Data_StartUpFailed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Data_NewDataArrived(object sender, EventArgs e)
+        {
+            //Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
+
+            // Kalibrierung nach StartUp
+            // SetBallPosition + Überprüfung + Event an ModelView wenn Kugel in Loch oder Kugel in Ziel
+
+            // TODO before the following steps --> START UP / CALIBRATION phase
+            // As long as the values are not "near" to zero --> DO NOTHING
+            // That means, that at the beginning of the game, the player does not 
+            // grab the board right --> therefore --> wait until board is held is "normal" position
+
+            // TODO: after START UP
+            // 1) Calculate difference between old values and new values --> and then calculate movement of ball
+            // 2) Check if Ball would hit wall --> prevent this
+            // 3) If ball is in hole --> trigger event to UI
+            // 4) If ball is in finish --> trigger event to UI
+
+            // Maybe some of these tasks could be integrated into the Model "GameField"
+        }
+
+        // --------------------------------------------------
+        //                      METHODS
+        // --------------------------------------------------
+        public void LoadNewField(GameField.GameElements[,] PlayField)
+        {
+            TheGameField = PlayField;
+        }
+
+        private void OnPropertyChanged(string prop_name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop_name));
         }
     }
 }

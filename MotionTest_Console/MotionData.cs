@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MotionTest
+namespace BallInAMaze
 {
     public class MotionData
     {
         // Event that is called if new Data is available
         public event EventHandler NewDataAvailable;
+        public event EventHandler StartUpFailed;
+        public event EventHandler DataError;
 
         // Motion Data: 3 axis: X, Y and Z
         public int Axis_X { get; private set; }
@@ -34,10 +36,9 @@ namespace MotionTest
         /// CTOR
         /// </summary>
         /// <param name="newDataEvent"></param>
-        public MotionData(EventHandler newDataEvent)
+        public MotionData(int PortNumber)
         {
-            // Connect EVENT to internal event --> user can handle NEW DATA
-            NewDataAvailable += newDataEvent;
+            // TODO: remove this --> the correct port number is given in as parameter
 
             // Open Serial Port to read from Board
             Console.WriteLine("Available COM Ports: {0}", SerialPort.GetPortNames().Length);
@@ -59,6 +60,7 @@ namespace MotionTest
 
             // Create NEW SERIAL PORT
             mPort = new SerialPort(SerialPort.GetPortNames()[portnum - 1], 115200, Parity.None, 8, StopBits.One);
+            //mPort = new SerialPort(SerialPort.GetPortNames()[PortNumber - 1], 115200, Parity.None, 8, StopBits.One);
 
             // Attach a method to be called when there
             // is data waiting in the port's buffer
@@ -66,33 +68,41 @@ namespace MotionTest
             mPort.ReadTimeout = 10000;  // Exception if now data is received after 10 sec
 
             // Begin communications
-            try
-            {
+            try {
                 mPort.Open();
             }
             catch (Exception)
             {
-                Console.WriteLine("ERROR: could not open PORT!");
+                PrintInformation("ERROR: could not open PORT!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
             // Check if port is really OPEN
             if (!mPort.IsOpen)
             {
-                Console.WriteLine("ERROR: could not open PORT!");
+                PrintInformation("ERROR: could not open PORT!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
             // Firstly: send port START condition
-            try
-            {
+            try {
                 mPort.Write(StartCondition, 0, 2);
             }
             catch (Exception)
             {
-                Console.WriteLine("ERROR: could not send START condition!");
+                PrintInformation("ERROR: could not send START condition!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
+        }
+
+        // THIS method can be exchanged if we are not longer
+        // using a CONSOLE application BUT a real UI application
+        public void PrintInformation(string info, params object[] obj)
+        {
+            Console.WriteLine(info, obj);
         }
 
         /// <summary>
@@ -135,14 +145,16 @@ namespace MotionTest
             // ACK must contain 2 bytes!
             if (read_ret != 2)
             {
-                Console.WriteLine("ERROR: Did not receive correct amount of bytes for ACK!");
+                PrintInformation("ERROR: Did not receive correct amount of bytes for ACK!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
             // Check if we received the CORRECT ACK bytes
             if (BitConverter.ToUInt16(ack, 0) != ack_check)
             {
-                Console.WriteLine("ERROR: Did not receive ACK from Board!");
+                PrintInformation("ERROR: Did not receive ACK from Board!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
@@ -167,7 +179,8 @@ namespace MotionTest
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("ERROR: reading UART: {0}", e.Message);
+                    PrintInformation("ERROR: reading UART: {0}", e.Message);
+                    DataError?.Invoke(this, EventArgs.Empty);
                     return;
                 }
             }
