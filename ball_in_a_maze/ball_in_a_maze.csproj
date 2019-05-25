@@ -57,6 +57,9 @@
     </ApplicationDefinition>
     <Compile Include="ActiveCOMPorts.cs" />
     <Compile Include="GameField.cs" />
+    <Compile Include="GamePage.xaml.cs">
+      <DependentUpon>GamePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LevelTraining.cs" />
     <Compile Include="MotionData.cs" />
     <Compile Include="StartPage.xaml.cs">
@@ -64,6 +67,10 @@
     </Compile>
     <Compile Include="TheGame.cs" />
     <Compile Include="ViewModel.cs" />
+    <Page Include="GamePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

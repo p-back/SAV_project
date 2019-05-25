@@ -22,7 +22,7 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <ComboBox Grid.Column="1" Margin="15,30" ItemsSource="{Binding ActiveCOMPorts.Ports}"></ComboBox>
+            <ComboBox Grid.Column="1" Margin="15,30" ItemsSource="{Binding COMPorts}" FontStretch="UltraExpanded" Name="cboxPorts"></ComboBox>
             <TextBlock Grid.Column="0" Margin="5,30" FontSize="20"> Choose an active COM port for a connection to the minized board.</TextBlock>
         </Grid>
 

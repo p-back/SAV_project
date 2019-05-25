@@ -12,6 +12,7 @@ namespace ball_in_a_maze
         // Event that is called if new Data is available
         public event EventHandler NewDataAvailable;
         public event EventHandler StartUpFailed;
+        public event EventHandler StartUpSuccessfull;
         public event EventHandler DataError;
 
         // Motion Data: 3 axis: X, Y and Z
@@ -32,43 +33,36 @@ namespace ball_in_a_maze
         // Start Condition that is sent to Board at startup
         private readonly byte[] StartCondition = new byte[2] { 0xAF, 0xFE };
 
-        /// <summary>
-        /// CTOR
-        /// </summary>
-        /// <param name="newDataEvent"></param>
-        public MotionData(int PortNumber)
+        // THIS method can be exchanged if we are not longer
+        // using a CONSOLE application BUT a real UI application
+        public void PrintInformation(string info, params object[] obj)
         {
-            // TODO: remove this --> the correct port number is given in as parameter
+            Console.WriteLine(info, obj);
+        }
 
-            // Open Serial Port to read from Board
-            Console.WriteLine("Available COM Ports: {0}", SerialPort.GetPortNames().Length);
-            int i = 1;
-            foreach (var item in SerialPort.GetPortNames())
-            {
-                Console.WriteLine("[{0}] Port Name: {1}", i++, item);
-            }
-
-            // Ask user to SELECT correct PORT
-            Console.WriteLine("Select Port number and press ENTER!");
-            var input = Console.ReadLine();
-            int portnum = 0;
-            if (!int.TryParse(input, out portnum) || (portnum > SerialPort.GetPortNames().Length))
-            {
-                Console.WriteLine("ERROR: wrong PORT number!");
-                return;
-            }
+        /// <summary>
+        /// Method can be called to establish a Connection to motion board
+        /// </summary>
+        /// <param name="PortNum">Index of COM Port in "GetPortNames()" array</param>
+        public void TryConnect(int PortNum)
+        {
+            // testing purposes
+            // TODO: remove this
+            StartUpSuccessfull(this, EventArgs.Empty);
+            //StartUpFailed(this, EventArgs.Empty);
+            return;
 
             // Create NEW SERIAL PORT
-            mPort = new SerialPort(SerialPort.GetPortNames()[portnum - 1], 115200, Parity.None, 8, StopBits.One);
-            //mPort = new SerialPort(SerialPort.GetPortNames()[PortNumber - 1], 115200, Parity.None, 8, StopBits.One);
+            mPort = new SerialPort(SerialPort.GetPortNames()[PortNum - 1], 115200, Parity.None, 8, StopBits.One);
 
             // Attach a method to be called when there
             // is data waiting in the port's buffer
             mPort.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived_Handler);
-            mPort.ReadTimeout = 10000;  // Exception if now data is received after 10 sec
+            mPort.ReadTimeout = 10000;  // Exception if no data is received after 10 sec
 
             // Begin communications
-            try {
+            try
+            {
                 mPort.Open();
             }
             catch (Exception)
@@ -87,7 +81,8 @@ namespace ball_in_a_maze
             }
 
             // Firstly: send port START condition
-            try {
+            try
+            {
                 mPort.Write(StartCondition, 0, 2);
             }
             catch (Exception)
@@ -96,13 +91,9 @@ namespace ball_in_a_maze
                 StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
-        }
 
-        // THIS method can be exchanged if we are not longer
-        // using a CONSOLE application BUT a real UI application
-        public void PrintInformation(string info, params object[] obj)
-        {
-            Console.WriteLine(info, obj);
+            // signal that startup was successfull
+            StartUpSuccessfull(this, EventArgs.Empty);
         }
 
         /// <summary>
