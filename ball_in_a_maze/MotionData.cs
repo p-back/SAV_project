@@ -38,6 +38,8 @@ namespace ball_in_a_maze
         /// <param name="newDataEvent"></param>
         public MotionData(int PortNumber)
         {
+            // -----------------------------------------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------
             // TODO: remove this --> the correct port number is given in as parameter
 
             // Open Serial Port to read from Board
@@ -58,9 +60,21 @@ namespace ball_in_a_maze
                 return;
             }
 
+            TryConnect(portnum);
+            // -----------------------------------------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------
+
+            //TryConnect(PortNumber);
+        }
+
+        /// <summary>
+        /// Method can be called to establish a Connection to motion board
+        /// </summary>
+        /// <param name="PortNum">Index of COM Port in "GetPortNames()" array</param>
+        public void TryConnect(int PortNum)
+        {
             // Create NEW SERIAL PORT
-            mPort = new SerialPort(SerialPort.GetPortNames()[portnum - 1], 115200, Parity.None, 8, StopBits.One);
-            //mPort = new SerialPort(SerialPort.GetPortNames()[PortNumber - 1], 115200, Parity.None, 8, StopBits.One);
+            mPort = new SerialPort(SerialPort.GetPortNames()[PortNum - 1], 115200, Parity.None, 8, StopBits.One);
 
             // Attach a method to be called when there
             // is data waiting in the port's buffer
@@ -68,7 +82,8 @@ namespace ball_in_a_maze
             mPort.ReadTimeout = 10000;  // Exception if now data is received after 10 sec
 
             // Begin communications
-            try {
+            try
+            {
                 mPort.Open();
             }
             catch (Exception)
@@ -87,7 +102,8 @@ namespace ball_in_a_maze
             }
 
             // Firstly: send port START condition
-            try {
+            try
+            {
                 mPort.Write(StartCondition, 0, 2);
             }
             catch (Exception)

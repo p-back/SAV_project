@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ball_in_a_maze
 {
+    // TODO: this class must not implement the PropertyChanged Event! --> Change this
     class ActiveCOMPorts : INotifyPropertyChanged
     {
         public ActiveCOMPorts()
