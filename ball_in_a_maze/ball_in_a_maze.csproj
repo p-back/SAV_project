@@ -77,6 +77,7 @@
     </Compile>
     <Compile Include="Levels\LevelTraining.cs" />
     <Compile Include="Game\MotionData.cs" />
+    <Compile Include="Pages\GridIndexToPixelConverter.cs" />
     <Compile Include="Pages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>

@@ -8,10 +8,11 @@
       d:DesignHeight="600" d:DesignWidth="600"
       Title="GamePage">
 
+
     <Grid>
         <Grid x:Name="gridGame"></Grid>
         <Canvas>
-            <Ellipse x:Name="ellBall" Canvas.Left="{Binding Ball_X}" Canvas.Top="{Binding Ball_Y}" Fill="Gold" Stroke="Black" StrokeThickness="1"></Ellipse>
+            <Ellipse x:Name="ellBall"></Ellipse>
         </Canvas>
     </Grid>
 
