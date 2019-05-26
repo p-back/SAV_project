@@ -23,14 +23,15 @@
 #define GPIO_DEVICE_ID  		XPAR_XGPIOPS_0_DEVICE_ID
 #define GPIO_AXI0_DEVICE_ID  	XPAR_GPIO_0_DEVICE_ID
 
-#define GPIO_PS_BUTTON_OFFSET				0 //MIO#0
-#define GPIO_PS_LED_R_OFFSET				52 //MIO#52 (906+52=958)
-#define GPIO_PS_LED_G_OFFSET				53 //MIO#53 (906+53=959)
+#define GPIO_PS_BUTTON_OFFSET				0 	//MIO#0
+#define GPIO_PS_LED_R_OFFSET				52 	//MIO#52 (906+52=958)
+#define GPIO_PS_LED_G_OFFSET				53 	//MIO#53 (906+53=959)
 
 // ----------------------------------------------
 //		PRIVATE VARIABLES
-static const u32 PSRedLedPin 	= 52; /* MIO_52 = Red LED */
-static const u32 PSGreenLedPin 	= 53; /* MIO53 = Green LED */
+static const u32 PsButtonPin 	= 0; 	/* MIO_0 = PS Pushbutton 	*/
+static const u32 PSRedLedPin 	= 52; 	/* MIO_52 = Red LED 		*/
+static const u32 PSGreenLedPin 	= 53; 	/* MIO53 = Green LED 		*/
 
 // GPIO Instances
 static XGpioPs 	PS_Gpio;	/* The driver instance for PS GPIO Device. */
@@ -90,6 +91,13 @@ void GPIO_Set_PL_Color(unsigned char led_color)
 	}
 }
 
+bool GPIO_Get_PS_Button(void)
+{
+	unsigned char PsButtonStatus;
+	PsButtonStatus = XGpioPs_ReadPin(&PS_Gpio, PsButtonPin);
+	return (PsButtonStatus == 0 ? false : true);
+}
+
 int GPIO_Init()
 {
 	XGpioPs_Config *ConfigPtr;
@@ -102,6 +110,9 @@ int GPIO_Init()
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
+
+	/* Set the direction for the PS button pin to be input. */
+	XGpioPs_SetDirectionPin(&PS_Gpio, PsButtonPin, 0x0);
 
 	/* Set the direction for the LED pins to be outputs */
 	XGpioPs_SetDirectionPin(&PS_Gpio, PSRedLedPin, 1);

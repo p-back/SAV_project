@@ -52,12 +52,18 @@ int main()
     // Init LIS2DS12 Sensor
     LIS2DS12_Init();
 
+START:
     // STARTUP PHASE --> ***BLOCKING*** until start condition is received
     if(StartUp_Phase() != SUCCESS) return FAILURE;
 
     // Prevent PROGRAM from EXITING
     while(1)
     {
+    	if (GPIO_Get_PS_Button())
+    	{
+    		goto START;
+    	}
+
 		// Read and Print Motion values
     	motion = LIS2DS12_Get_Motion();
 

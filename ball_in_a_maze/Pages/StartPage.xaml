@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ball_in_a_maze"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="600"
       Title="StartPage">
 
     <Grid>
@@ -15,18 +15,19 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="60" Text="The ball-in-a-maze game!"></TextBlock>
+
+        <Label Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" >The ball-in-a-maze game!</Label>
         <Grid Grid.Row="1" Margin="30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <ComboBox Grid.Column="1" Margin="15,30" ItemsSource="{Binding ActiveCOMPorts.Ports}"></ComboBox>
-            <TextBlock Grid.Column="0" Margin="5,30" FontSize="20"> Choose an active COM port for a connection to the minized board.</TextBlock>
+            <ComboBox Grid.Column="1" Margin="15,30" ItemsSource="{Binding COMPorts}" Height="20" Name="cboxPorts"></ComboBox>
+            <Label Grid.Column="0" Margin="5,30" FontSize="14" VerticalAlignment="Center"> Choose an active COM port for a connection to the minized board:</Label>
         </Grid>
 
-        <Button Grid.Row="2" Margin="100,40" FontSize="30" Name="btnConnect" Click="btnConnect_Click">Connect</Button>
+        <Button Grid.Row="2" Margin="150,80" FontSize="30" Name="btnConnect" Click="btnConnect_Click">Connect</Button>
 
         
     </Grid>

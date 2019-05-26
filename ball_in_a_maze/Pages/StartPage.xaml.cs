@@ -26,12 +26,12 @@ namespace ball_in_a_maze
         }
 
 
-        public event EventHandler ConnectionEstablished;
+        public event EventHandler TryConnecting;
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (ConnectionEstablished != null)
-                ConnectionEstablished(this, EventArgs.Empty);
+            if (TryConnecting != null)
+                TryConnecting(this, EventArgs.Empty);
         }
     }
 }

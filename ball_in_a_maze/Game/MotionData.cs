@@ -12,6 +12,7 @@ namespace ball_in_a_maze
         // Event that is called if new Data is available
         public event EventHandler NewDataAvailable;
         public event EventHandler StartUpFailed;
+        public event EventHandler StartUpSuccessfull;
         public event EventHandler DataError;
 
         // Motion Data: 3 axis: X, Y and Z
@@ -32,39 +33,28 @@ namespace ball_in_a_maze
         // Start Condition that is sent to Board at startup
         private readonly byte[] StartCondition = new byte[2] { 0xAF, 0xFE };
 
-        /// <summary>
-        /// CTOR
-        /// </summary>
-        /// <param name="newDataEvent"></param>
-        public MotionData(int PortNumber)
+        private readonly string LogFile_Path = System.AppDomain.CurrentDomain.BaseDirectory + "BallInAMaze.log";
+
+        // THIS method can be exchanged if we are not longer
+        // using a CONSOLE application BUT a real UI application
+        public void PrintInformation(string info)
         {
-            // -----------------------------------------------------------------------------------------------
-            // -----------------------------------------------------------------------------------------------
-            // TODO: remove this --> the correct port number is given in as parameter
+            // Write Message to LOG FILE
+            System.IO.File.AppendAllText(LogFile_Path, info + '\n');
+        }
 
-            // Open Serial Port to read from Board
-            Console.WriteLine("Available COM Ports: {0}", SerialPort.GetPortNames().Length);
-            int i = 1;
-            foreach (var item in SerialPort.GetPortNames())
+        public MotionData()
+        {
+            // Delete old LOG files
+            // Catch Exceptions from this Method, but we dont care!
+            try
             {
-                Console.WriteLine("[{0}] Port Name: {1}", i++, item);
+                System.IO.File.Delete(LogFile_Path);
             }
-
-            // Ask user to SELECT correct PORT
-            Console.WriteLine("Select Port number and press ENTER!");
-            var input = Console.ReadLine();
-            int portnum = 0;
-            if (!int.TryParse(input, out portnum) || (portnum > SerialPort.GetPortNames().Length))
+            catch (Exception)
             {
-                Console.WriteLine("ERROR: wrong PORT number!");
-                return;
+                // Do nothing!
             }
-
-            TryConnect(portnum);
-            // -----------------------------------------------------------------------------------------------
-            // -----------------------------------------------------------------------------------------------
-
-            //TryConnect(PortNumber);
         }
 
         /// <summary>
@@ -73,13 +63,22 @@ namespace ball_in_a_maze
         /// <param name="PortNum">Index of COM Port in "GetPortNames()" array</param>
         public void TryConnect(int PortNum)
         {
+            // Check given Port Number
+            if ((PortNum < 0) || (PortNum > SerialPort.GetPortNames().Length-1))
+            {
+                PrintInformation("ERROR: Wrong port number in MotionData.cs:TryConnect!");
+                StartUpFailed?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
             // Create NEW SERIAL PORT
-            mPort = new SerialPort(SerialPort.GetPortNames()[PortNum - 1], 115200, Parity.None, 8, StopBits.One);
+            mPort = new SerialPort(SerialPort.GetPortNames()[PortNum], 115200, Parity.None, 8, StopBits.One);
 
             // Attach a method to be called when there
             // is data waiting in the port's buffer
             mPort.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived_Handler);
-            mPort.ReadTimeout = 10000;  // Exception if now data is received after 10 sec
+            mPort.ReadTimeout = 10000;  // Exception if no data is received after 10 sec
+            mPort.WriteTimeout = 10;
 
             // Begin communications
             try
@@ -112,13 +111,6 @@ namespace ball_in_a_maze
                 StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
-        }
-
-        // THIS method can be exchanged if we are not longer
-        // using a CONSOLE application BUT a real UI application
-        public void PrintInformation(string info, params object[] obj)
-        {
-            Console.WriteLine(info, obj);
         }
 
         /// <summary>
@@ -176,7 +168,9 @@ namespace ball_in_a_maze
 
             // SET GLOBAL FLAG
             IsConnected = true;
-            return;
+
+            // Inform ViewModel, that StartUp was successful
+            StartUpSuccessfull?.Invoke(this, EventArgs.Empty);
         }
 
         public void BlockingRead(byte[] buffer, int offset, int count)
@@ -195,7 +189,7 @@ namespace ball_in_a_maze
                 }
                 catch (Exception e)
                 {
-                    PrintInformation("ERROR: reading UART: {0}", e.Message);
+                    PrintInformation("ERROR: reading UART: " + e.Message);
                     DataError?.Invoke(this, EventArgs.Empty);
                     return;
                 }

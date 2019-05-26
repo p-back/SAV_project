@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace ball_in_a_maze
 {
-    // TODO: this class must not implement the PropertyChanged Event! --> Change this
-    class ActiveCOMPorts : INotifyPropertyChanged
+    class ActiveCOMPorts
     {
         public ActiveCOMPorts()
         {
@@ -21,9 +20,9 @@ namespace ball_in_a_maze
             Worker.RunWorkerAsync();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler PortsUpdated;
 
-        internal void OnConnectionestablished(object sender, EventArgs e)
+        internal void OnConnectionEstablished(object sender, EventArgs e)
         {
             Worker.CancelAsync();
         }
@@ -46,9 +45,11 @@ namespace ball_in_a_maze
         {
             get { return ports; }
             set {
-                ports = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Ports"));
+                if(!Equals(ports, value))
+                {
+                    ports = value;
+                    PortsUpdated(this, EventArgs.Empty);
+                }
             }
         }
 

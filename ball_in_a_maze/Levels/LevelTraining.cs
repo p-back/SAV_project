@@ -18,8 +18,8 @@ namespace ball_in_a_maze
 
         public LevelTraining()
         {
-            Height = 10;
-            Width = 10;
+            Height = 50;
+            Width = 50;
 
             Level = new GameField.GameElements[Height, Width];
 
@@ -39,7 +39,7 @@ namespace ball_in_a_maze
                 }
             }
             // set finish in the right upper edge
-            Level[Height - 1, Width - 1] = GameField.GameElements.Finish;
+            Level[Height - 2, Width - 2] = GameField.GameElements.Finish;
         }
     }
 }

@@ -76,7 +76,7 @@ namespace BallInAMaze
         // --------------------------------------------------
         public TheGame(int GameField_Width, int GameField_Height, int PortNumber)
         {
-            field = new GameField(GameField_Width, GameField_Height);
+            //field = new GameField(GameField_Width, GameField_Height);
             data = new MotionData(PortNumber);
             data.NewDataAvailable   += Data_NewDataArrived;
             data.StartUpFailed      += Data_StartUpFailed;
@@ -98,7 +98,7 @@ namespace BallInAMaze
 
         private void Data_NewDataArrived(object sender, EventArgs e)
         {
-            //Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
+            Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
 
             // Kalibrierung nach StartUp
             // SetBallPosition + Überprüfung + Event an ModelView wenn Kugel in Loch oder Kugel in Ziel

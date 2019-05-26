@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ball_in_a_maze
@@ -12,53 +13,17 @@ namespace ball_in_a_maze
         // --------------------------------------------------
         //                  PROPERTIES
         // --------------------------------------------------
-        public GameField.GameElements[,] TheGameField
-        {
-            get { return Field.PlayField; }
-            set
-            {
-                if (!Equals(value, Field.PlayField))
-                {
-                    Field.PlayField = value;
-                    //OnPropertyChanged("TheGameField");
-                }
-            }
-        }
-
-        public int BallPosition_X
-        {
-            get { return Field.BallPosition_X_W; }
-            set
-            {
-                if (value != Field.BallPosition_X_W)
-                {
-                    Field.BallPosition_X_W = value;
-                    //OnPropertyChanged("BallPosition_X");
-                }
-            }
-        }
-        public int BallPosition_Y
-        {
-            get { return Field.BallPosition_Y_H; }
-            set
-            {
-                if (value != Field.BallPosition_Y_H)
-                {
-                    Field.BallPosition_Y_H = value;
-                    //OnPropertyChanged("BallPosition_Y");
-                }
-            }
-        }
-
         public MotionData Data { get => data; private set => data = value; }
         public GameField Field { get => field; private set => field = value; }
+        public bool GameEnabled { get; set; }
 
         // --------------------------------------------------
         //                  EVENTS
         // --------------------------------------------------
         public event EventHandler BallIsInHole;
         public event EventHandler BallIsInFinish;
-        public event EventHandler PositionHasChanged;
+        public event EventHandler BallPositionHasChanged;
+        public event EventHandler GameFieldHasChanged;
 
         // --------------------------------------------------
         //                  MEMBERS
@@ -68,30 +33,72 @@ namespace ball_in_a_maze
         private int Old_Value_X = 0;
         private int Old_Value_Y = 0;
 
+        // Flag to ensure that motion board is calibrated
+        private bool IsCalibrated = false;
+
         private GameField field;
         private MotionData data;
 
         // --------------------------------------------------
         //                      CTOR
         // --------------------------------------------------
-        public TheGame(int GameField_Width, int GameField_Height, int PortNumber)
+        public TheGame()
         {
-            field = new GameField(GameField_Width, GameField_Height);
-            data = new MotionData(PortNumber);
-           
-            data.NewDataAvailable   += Data_NewDataArrived;
-            /* This is done in the ViewModel
-            data.StartUpFailed      += Data_StartUpFailed;
-            data.DataError          += Data_DataError;
-            */
+            field = new GameField();
+            data = new MotionData();
+
+            GameEnabled = false;
+
+            // TODO: remove this
+            Worker = new BackgroundWorker();
+            Worker.DoWork += OnWorkerDoWork;
+            Worker.RunWorkerAsync();
         }
+
+        private void OnWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                if (GameEnabled)
+                {
+                    while (field.BallPosition_X_W < 40)
+                    {
+                        Field.BallPosition_X_W += 0.5;
+                        Field.BallPosition_Y_H += 0.5;
+                        BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+                        Thread.Sleep(100);
+                    }
+                    while (field.BallPosition_X_W > 10)
+                    {
+                        Field.BallPosition_X_W -= 0.5;
+                        Field.BallPosition_Y_H -= 0.5;
+                        BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+        }
+
+        public BackgroundWorker Worker { get; set; }
 
         // --------------------------------------------------
         //              IMPLEMENTED EVENTS
         // --------------------------------------------------
-
         private void Data_NewDataArrived(object sender, EventArgs e)
         {
+            // DO NOTHING --> if Game is NOT enabled yet
+            if (!GameEnabled)
+                return;
+
+            // If Board is NOT calibrated yet --> calibrate it
+            if (!IsCalibrated)
+            {
+                Calibrate();
+                return;
+            }
+
+            // If Game is ENABLED and Board is CALIBRATED --> handle motion data and set BALL POSITION
+
             //Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
 
             // Kalibrierung nach StartUp
@@ -112,12 +119,24 @@ namespace ball_in_a_maze
             // Maybe some of these tasks could be integrated into the Model "GameField"
         }
 
+        private void Calibrate()
+        {
+            if ((Data.Axis_X <= 150) && (Data.Axis_X >= -150) &&
+                (Data.Axis_Y <= 150) && (Data.Axis_Y >= -150))
+            {
+                IsCalibrated = true;
+            }
+        }
+
         // --------------------------------------------------
         //                      METHODS
         // --------------------------------------------------
-        public void LoadNewField(GameField.GameElements[,] PlayField)
+        public void LoadNewField(GameField.GameElements[,] PlayField, int Width, int Height, int StartPositionX = 1, int StartPositionY = 1)
         {
-            TheGameField = PlayField;
+            Field.PlayField = PlayField;
+            Field.Width = Width;
+            Field.Height = Height;
+            GameFieldHasChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

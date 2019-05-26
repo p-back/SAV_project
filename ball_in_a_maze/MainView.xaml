@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ball_in_a_maze"
         mc:Ignorable="d"
-        Title="MainView" Height="600" Width="800">
+        Title="MainView" Height="650" Width="1000"
+        ResizeMode="NoResize">
 
-    <Frame Name="MainFrame" Margin="50"></Frame>
+    <Frame Name="MainFrame" Height="600" Width="600" HorizontalAlignment="Left" NavigationUIVisibility="Hidden"></Frame>
 </Window>
