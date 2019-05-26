@@ -55,6 +55,13 @@ namespace ball_in_a_maze
             Worker.RunWorkerAsync();
         }
 
+        public void ResetGame()
+        {
+            // TODO: reset ball position
+
+            // TODO: evtl kalibrieren
+        }
+
         private void OnWorkerDoWork(object sender, DoWorkEventArgs e)
         {
             while (true)
