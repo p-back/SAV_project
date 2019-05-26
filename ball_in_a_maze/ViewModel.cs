@@ -32,6 +32,7 @@ namespace ball_in_a_maze
 
             // create the levels
             levelTraining = new LevelTraining();
+            levelBeginner = new LevelBeginner();
 
             // create the game and connect to events
             theGame = new TheGame();
@@ -44,12 +45,14 @@ namespace ball_in_a_maze
             theGame.Data.DataError              += OnDataError;
 
             // create the pages 
-            startPage = new StartPage();
+            startPage =         new StartPage();
+            gamePage =          new GamePage();
+            chooseLevelPage =   new ChooseLevelPage();
+            winPage =           new WinPage();
+            losePage =          new LosePage();
+            // set data context of the pages which will do some binding
             startPage.DataContext = this;
-            gamePage = new GamePage();
             gamePage.DataContext = this;
-            chooseLevelPage = new ChooseLevelPage();
-            chooseLevelPage.DataContext = this;
             // and bind functions to their events
             startPage.TryConnecting                 += OnTryConnecting;
             gamePage.ResetGame                      += OnResetGame;
@@ -58,6 +61,12 @@ namespace ball_in_a_maze
             chooseLevelPage.LevelTrainingSelected   += OnLevelTrainingSelected;
             chooseLevelPage.LevelBeginnerSelected   += OnLevelBeginnerSelected;
             chooseLevelPage.LevelAdvancedSelected   += OnLevelAdvancedSelected;
+            winPage.RetryLevel                      += OnRetryLevel;
+            winPage.ChooseAnotherLevel              += OnChooseAnotherLevel;
+            winPage.CloseGame                       += CloseGame;
+            losePage.RetryLevel                     += OnRetryLevel;
+            losePage.ChooseAnotherLevel             += OnChooseAnotherLevel;
+            losePage.CloseGame                      += CloseGame;
 
             // load the start page
             ChangeToPage(startPage);
@@ -114,8 +123,7 @@ namespace ball_in_a_maze
         private void OnLevelBeginnerSelected(object sender, EventArgs e)
         {
             //load the training level
-            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
-
+            theGame.LoadNewField(levelBeginner.Level, levelBeginner.Width, levelBeginner.Height);
         }
 
         private void OnLevelTrainingSelected(object sender, EventArgs e)
@@ -125,18 +133,23 @@ namespace ball_in_a_maze
         }
         private void CloseGame(object sender, EventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void OnChooseAnotherLevel(object sender, EventArgs e)
         {
             ChangeToPage(chooseLevelPage);
-            //theGame.ResetGame();
         }
 
         private void OnResetGame(object sender, EventArgs e)
         {
-            //theGame.ResetGame();
+            theGame.ResetGame();
+            theGame.GameEnabled = true;
+        }
+        private void OnRetryLevel(object sender, EventArgs e)
+        {
+            ChangeToPage(gamePage);
+            theGame.GameEnabled = true;
         }
 
         // --------------------------------------------------
@@ -158,12 +171,14 @@ namespace ball_in_a_maze
         }
         private void OnBallIsInFinish(object sender, EventArgs e)
         {
-            // TODO switch to WIN page
+            ChangeToPage(winPage);
+            theGame.GameEnabled = false;
         }
 
         private void OnBallIsInHole(object sender, EventArgs e)
         {
-            // TODO switch to LOST page
+            ChangeToPage(losePage);
+            theGame.GameEnabled = false;
         }
         private void OnDataError(object sender, EventArgs e)
         {
@@ -191,7 +206,7 @@ namespace ball_in_a_maze
             // startup was succesfull we can switch to the choose level page
             ChangeToPage(chooseLevelPage);
         }
-        
+
         // --------------------------------------------------
         //                  MEMBERS
         // --------------------------------------------------
@@ -200,11 +215,14 @@ namespace ball_in_a_maze
 
         // the levels
         private LevelTraining levelTraining { get; set; }
+        private LevelBeginner levelBeginner{ get; set; }
 
         // the UI pages
         private StartPage startPage { get; set; }
         private GamePage gamePage { get; set; }
         private ChooseLevelPage chooseLevelPage { get; set; }
+        private WinPage winPage{ get; set; }
+        private LosePage losePage{ get; set; }
 
         // class to display active COM connections
         private ActiveCOMPorts activeCOMPorts { get; set; }
@@ -214,7 +232,7 @@ namespace ball_in_a_maze
         // --------------------------------------------------
         private void ChangeToPage(Page p)
         {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
+            mainView.Dispatcher.Invoke(() =>
             {
                 mainView.MainFrame.Navigate(p);
             });

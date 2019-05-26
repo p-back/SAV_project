@@ -16,15 +16,15 @@ using System.Windows.Shapes;
 namespace ball_in_a_maze
 {
     /// <summary>
-    /// Interaktionslogik für WinPage.xaml
+    /// Interaktionslogik für LosePage.xaml
     /// </summary>
-    public partial class WinPage : Page
+    public partial class LosePage : Page
     {
-        public WinPage()
+        public LosePage()
         {
             InitializeComponent();
         }
-        
+
         public event EventHandler RetryLevel;
         public event EventHandler ChooseAnotherLevel;
         public event EventHandler CloseGame;

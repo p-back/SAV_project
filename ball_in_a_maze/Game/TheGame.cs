@@ -58,14 +58,14 @@ namespace ball_in_a_maze
             {
                 if (GameEnabled)
                 {
-                    while (field.BallPosition_X_W < 40)
+                    while (field.BallPosition_X_W < 0.9*field.Width)
                     {
                         Field.BallPosition_X_W += 0.1;
                         Field.BallPosition_Y_H += 0.1;
                         BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
                         Thread.Sleep(10);
                     }
-                    while (field.BallPosition_X_W > 10)
+                    while (field.BallPosition_X_W > 0.1 * field.Width)
                     {
                         Field.BallPosition_X_W -= 0.2;
                         Field.BallPosition_Y_H -= 0.2;
@@ -115,7 +115,15 @@ namespace ball_in_a_maze
             Field.PlayField = PlayField;
             Field.Width = Width;
             Field.Height = Height;
+            Field.BallPosition_X_W = StartPositionX;
+            Field.BallPosition_Y_H = StartPositionY;
             GameFieldHasChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void ResetGame()
+        {
+            Field.BallPosition_X_W = 1;
+            Field.BallPosition_Y_H = 1;
         }
     }
 }
