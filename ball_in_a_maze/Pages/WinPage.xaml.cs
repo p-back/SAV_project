@@ -16,20 +16,13 @@ using System.Windows.Shapes;
 namespace ball_in_a_maze
 {
     /// <summary>
-    /// Interaktionslogik für StartPage.xaml
+    /// Interaktionslogik für WinPage.xaml
     /// </summary>
-    public partial class StartPage : Page
+    public partial class WinPage : Page
     {
-        public StartPage()
+        public WinPage()
         {
             InitializeComponent();
-        }
-
-        public event EventHandler TryConnecting;
-
-        private void btnConnect_Click(object sender, RoutedEventArgs e)
-        {
-            TryConnecting?.Invoke(this, EventArgs.Empty);
         }
     }
 }

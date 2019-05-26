@@ -20,17 +20,9 @@ namespace ball_in_a_maze
     /// </summary>
     public partial class GamePage : Page
     {
-        public GamePage(double PageHeight, double PageWidth)
+        public GamePage()
         {
             InitializeComponent();
-
-            // initialize ball
-            ellBall.Fill = new SolidColorBrush(Colors.Gold);
-            ellBall.Stroke = new SolidColorBrush(Colors.Black);
-
-            // save the page width and height for later usage
-            pageHeight = PageHeight;
-            pageWidth = PageWidth;
         }
 
         private void DoTheBinding(Ellipse ell, DependencyProperty prop, string str, GridIndexToPixelConverter conv)
@@ -42,9 +34,6 @@ namespace ball_in_a_maze
             bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             ell.SetBinding(prop, bind);
         }
-
-        private double pageHeight { get; set; }
-        private double pageWidth { get; set; }
 
         /// <summary>
         /// the class GamePage has one grid as top level object 
@@ -111,12 +100,31 @@ namespace ball_in_a_maze
             }
             
             // create the binding (must be done everytime a new field is loaded because the converter calculation changes)
-            DoTheBinding(ellBall, Canvas.LeftProperty, "Ball_X", new GridIndexToPixelConverter(pageWidth, Field.Width));
-            DoTheBinding(ellBall, Canvas.TopProperty, "Ball_Y", new GridIndexToPixelConverter(pageHeight, Field.Height));
+            DoTheBinding(ellBall, Canvas.LeftProperty, "Ball_X", new GridIndexToPixelConverter(gridGame.Width, Field.Width));
+            DoTheBinding(ellBall, Canvas.TopProperty, "Ball_Y", new GridIndexToPixelConverter(gridGame.Height, Field.Height));
 
             // set the new game ball size
-            ellBall.Height = pageHeight / Field.Height * 3 / 4;
-            ellBall.Width = pageWidth / Field.Width * 3 / 4;
+            ellBall.Height = gridGame.Height / Field.Height * 3 / 4;
+            ellBall.Width = gridGame.Width / Field.Width * 3 / 4;
+        }
+
+        public event EventHandler ResetGame;
+        public event EventHandler CloseGame;
+        public event EventHandler ChooseAnotherLevel;
+
+        private void btnResetGame_Click(object sender, RoutedEventArgs e)
+        {
+            ResetGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void btnChooseAnotherLevel_Click(object sender, RoutedEventArgs e)
+        {
+            ChooseAnotherLevel?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void btnCloseGame_Click(object sender, RoutedEventArgs e)
+        {
+            CloseGame?.Invoke(this, EventArgs.Empty);
         }
     }
 }

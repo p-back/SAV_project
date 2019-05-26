@@ -10,12 +10,8 @@ namespace ball_in_a_maze
     /// this class represents the beginner level of the ball in a maze game
     /// there are no holes, just borders at the edges
     /// </summary>
-    class LevelTraining
+    class LevelTraining : LevelBase
     {
-        public int Height { get; set; }
-        public int Width { get; set; }
-        public GameField.GameElements[,] Level { get; set; }
-
         public LevelTraining()
         {
             Height = 50;

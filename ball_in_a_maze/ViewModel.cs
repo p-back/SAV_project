@@ -43,19 +43,24 @@ namespace ball_in_a_maze
             theGame.Data.StartUpFailed          += OnStartUpFailed;
             theGame.Data.DataError              += OnDataError;
 
-            // create the pages
+            // create the pages 
             startPage = new StartPage();
             startPage.DataContext = this;
-            startPage.TryConnecting += OnTryConnecting;
-
-            gamePage = new GamePage(mainWindow.MainFrame.Height, mainWindow.MainFrame.Height);
+            gamePage = new GamePage();
             gamePage.DataContext = this;
-
-            //load the training level
-            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
+            chooseLevelPage = new ChooseLevelPage();
+            chooseLevelPage.DataContext = this;
+            // and bind functions to their events
+            startPage.TryConnecting                 += OnTryConnecting;
+            gamePage.ResetGame                      += OnResetGame;
+            gamePage.ChooseAnotherLevel             += OnChooseAnotherLevel;
+            gamePage.CloseGame                      += CloseGame;
+            chooseLevelPage.LevelTrainingSelected   += OnLevelTrainingSelected;
+            chooseLevelPage.LevelBeginnerSelected   += OnLevelBeginnerSelected;
+            chooseLevelPage.LevelAdvancedSelected   += OnLevelAdvancedSelected;
 
             // load the start page
-            mainWindow.MainFrame.Navigate(startPage);
+            ChangeToPage(startPage);
         }
 
         // --------------------------------------------------
@@ -100,19 +105,56 @@ namespace ball_in_a_maze
             int port = startPage.cboxPorts.SelectedIndex;
             theGame.Data.TryConnect(port);
         }
-        
+        private void OnLevelAdvancedSelected(object sender, EventArgs e)
+        {
+            //load the training level
+            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
+        }
+
+        private void OnLevelBeginnerSelected(object sender, EventArgs e)
+        {
+            //load the training level
+            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
+
+        }
+
+        private void OnLevelTrainingSelected(object sender, EventArgs e)
+        {
+            //load the training level
+            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
+        }
+        private void CloseGame(object sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void OnChooseAnotherLevel(object sender, EventArgs e)
+        {
+            ChangeToPage(chooseLevelPage);
+            //theGame.ResetGame();
+        }
+
+        private void OnResetGame(object sender, EventArgs e)
+        {
+            //theGame.ResetGame();
+        }
+
         // --------------------------------------------------
         //      FUNCTIONS BEHIND EVENTS FROM MODEL
         // --------------------------------------------------
         private void OnBallPositionHasChanged(object sender, EventArgs e)
         {
-            // set properties
-            Ball_X = theGame.Field.BallPosition_X_W;
-            Ball_Y = theGame.Field.BallPosition_Y_H;
+            // set properties (value doesnt matter, we jsut need to reach the set function)
+            Ball_X = 0;
+            Ball_Y = 0;
         }
         private void OnGameFieldHasChanged(object sender, EventArgs e)
         {
+            // load the game into the page before loading the page
             gamePage.LoadGameField(theGame.Field);
+            ChangeToPage(gamePage);
+            // enable game
+            theGame.GameEnabled = true;
         }
         private void OnBallIsInFinish(object sender, EventArgs e)
         {
@@ -129,7 +171,7 @@ namespace ball_in_a_maze
             // switch back to start page
             startPage.btnConnect.IsEnabled = true;
             startPage.cboxPorts.IsEnabled = true;
-            mainView.MainFrame.Navigate(startPage);
+            ChangeToPage(startPage);
         }
         private void OnStartUpFailed(object sender, EventArgs e)
         {
@@ -137,7 +179,7 @@ namespace ball_in_a_maze
             // switch back to start page
             startPage.btnConnect.IsEnabled = true;
             startPage.cboxPorts.IsEnabled = true;
-            mainView.MainFrame.Navigate(startPage);
+            ChangeToPage(startPage);
         }
         private void OnPortsUpdated(object sender, EventArgs e)
         {
@@ -146,12 +188,10 @@ namespace ball_in_a_maze
         }
         private void OnStartUpSuccessfull(object sender, EventArgs e)
         {
-            // startup was succesfull we can switch to the game page
-            mainView.MainFrame.Navigate(gamePage);
-            // enable game
-            theGame.GameEnabled = true;
+            // startup was succesfull we can switch to the choose level page
+            ChangeToPage(chooseLevelPage);
         }
-
+        
         // --------------------------------------------------
         //                  MEMBERS
         // --------------------------------------------------
@@ -164,8 +204,20 @@ namespace ball_in_a_maze
         // the UI pages
         private StartPage startPage { get; set; }
         private GamePage gamePage { get; set; }
+        private ChooseLevelPage chooseLevelPage { get; set; }
 
         // class to display active COM connections
         private ActiveCOMPorts activeCOMPorts { get; set; }
+
+        // --------------------------------------------------
+        //              OTHER METHODS
+        // --------------------------------------------------
+        private void ChangeToPage(Page p)
+        {
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                mainView.MainFrame.Navigate(p);
+            });
+        }
     }
 }
