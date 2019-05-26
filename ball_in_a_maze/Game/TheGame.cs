@@ -60,17 +60,17 @@ namespace ball_in_a_maze
                 {
                     while (field.BallPosition_X_W < 40)
                     {
-                        Field.BallPosition_X_W += 0.5;
-                        Field.BallPosition_Y_H += 0.5;
+                        Field.BallPosition_X_W += 0.1;
+                        Field.BallPosition_Y_H += 0.1;
                         BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
-                        Thread.Sleep(100);
+                        Thread.Sleep(10);
                     }
                     while (field.BallPosition_X_W > 10)
                     {
-                        Field.BallPosition_X_W -= 0.5;
-                        Field.BallPosition_Y_H -= 0.5;
+                        Field.BallPosition_X_W -= 0.2;
+                        Field.BallPosition_Y_H -= 0.2;
                         BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
-                        Thread.Sleep(100);
+                        Thread.Sleep(10);
                     }
                 }
             }

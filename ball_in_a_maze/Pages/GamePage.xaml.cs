@@ -20,14 +20,38 @@ namespace ball_in_a_maze
     /// </summary>
     public partial class GamePage : Page
     {
-        public GamePage()
+        public GamePage(double PageHeight, double PageWidth)
         {
             InitializeComponent();
+
+            // initialize ball
+            ellBall.Fill = new SolidColorBrush(Colors.Gold);
+            ellBall.Stroke = new SolidColorBrush(Colors.Black);
+
+            // save the page width and height for later usage
+            pageHeight = PageHeight;
+            pageWidth = PageWidth;
         }
 
+        private void DoTheBinding(Ellipse ell, DependencyProperty prop, string str, GridIndexToPixelConverter conv)
+        {
+            Binding bind = new Binding();
+            bind.Converter = conv;
+            bind.Path = new PropertyPath(str);
+            bind.Mode = BindingMode.OneWay;
+            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            ell.SetBinding(prop, bind);
+        }
+
+        private double pageHeight { get; set; }
+        private double pageWidth { get; set; }
+
         /// <summary>
-        /// the class GamePage only constists of one grid
+        /// the class GamePage has one grid as top level object 
+        /// there are a grid and a canvas in it
+        /// these two are overlapping
         /// this function fills this grid dynamically
+        /// the canvas has a ellipse which represents the game ball
         /// </summary>
         /// <param name="Field"></param>
         public void LoadGameField(GameField Field)
@@ -36,8 +60,6 @@ namespace ball_in_a_maze
             gridGame.Children.Clear();
             gridGame.RowDefinitions.Clear();
             gridGame.ColumnDefinitions.Clear();
-
-            gridGame.Loaded += OnLoaded;
 
             // create rows and coloums
             for (int i = 0; i < Field.Width; i++)
@@ -87,15 +109,14 @@ namespace ball_in_a_maze
                     }
                 }
             }
+            
+            // create the binding (must be done everytime a new field is loaded because the converter calculation changes)
+            DoTheBinding(ellBall, Canvas.LeftProperty, "Ball_X", new GridIndexToPixelConverter(pageWidth, Field.Width));
+            DoTheBinding(ellBall, Canvas.TopProperty, "Ball_Y", new GridIndexToPixelConverter(pageHeight, Field.Height));
 
-            // set the ball size and postion
-            ellBall.Height = 10;
-            ellBall.Width = 10;
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            double test = gridGame.ActualHeight;
+            // set the new game ball size
+            ellBall.Height = pageHeight / Field.Height * 3 / 4;
+            ellBall.Width = pageWidth / Field.Width * 3 / 4;
         }
     }
 }

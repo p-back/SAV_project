@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace ball_in_a_maze 
 {
-    class ViewModel : INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged
     {
         public MainView mainView { get; set; }
 
@@ -29,25 +30,26 @@ namespace ball_in_a_maze
             activeCOMPorts = new ActiveCOMPorts();
             activeCOMPorts.PortsUpdated += OnPortsUpdated;
 
-            // create the pages
-            startPage = new StartPage();
-            startPage.DataContext = this;
-            startPage.TryConnecting += OnTryConnecting;
-            gamePage = new GamePage();
-            gamePage.DataContext = this;
-
             // create the levels
             levelTraining = new LevelTraining();
 
             // create the game and connect to events
             theGame = new TheGame();
-            theGame.BallPositionHasChanged += OnBallPositionHasChanged;
-            theGame.GameFieldHasChanged += OnGameFieldHasChanged;
-            theGame.BallIsInHole += OnBallIsInHole;
-            theGame.BallIsInFinish += OnBallIsInFinish;
-            theGame.Data.StartUpSuccessfull += OnStartUpSuccessfull;
-            theGame.Data.StartUpFailed += OnStartUpFailed;
-            theGame.Data.DataError += OnDataError;
+            theGame.BallPositionHasChanged      += OnBallPositionHasChanged;
+            theGame.GameFieldHasChanged         += OnGameFieldHasChanged;
+            theGame.BallIsInHole                += OnBallIsInHole;
+            theGame.BallIsInFinish              += OnBallIsInFinish;
+            theGame.Data.StartUpSuccessfull     += OnStartUpSuccessfull;
+            theGame.Data.StartUpFailed          += OnStartUpFailed;
+            theGame.Data.DataError              += OnDataError;
+
+            // create the pages
+            startPage = new StartPage();
+            startPage.DataContext = this;
+            startPage.TryConnecting += OnTryConnecting;
+
+            gamePage = new GamePage(mainWindow.MainFrame.Height, mainWindow.MainFrame.Height);
+            gamePage.DataContext = this;
 
             //load the training level
             theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
