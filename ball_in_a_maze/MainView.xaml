@@ -8,5 +8,5 @@
         Title="Ball in a Maze" Height="650" Width="1000"
         ResizeMode="NoResize">
 
-    <Frame Name="MainFrame" Height="600" Width="600" HorizontalAlignment="Left" NavigationUIVisibility="Hidden"></Frame>
+    <Frame Name="MainFrame" HorizontalAlignment="Left" VerticalAlignment="Top" Height="610" Width="1000" NavigationUIVisibility="Hidden" Background="LightGray"></Frame>
 </Window>

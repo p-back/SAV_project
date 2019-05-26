@@ -72,6 +72,10 @@
     </ApplicationDefinition>
     <Compile Include="ActiveCOMPorts.cs" />
     <Compile Include="Game\GameField.cs" />
+    <Compile Include="Levels\LevelBase.cs" />
+    <Compile Include="Pages\ChooseLevelPage.xaml.cs">
+      <DependentUpon>ChooseLevelPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>
@@ -82,7 +86,14 @@
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Game\TheGame.cs" />
+    <Compile Include="Pages\WinPage.xaml.cs">
+      <DependentUpon>WinPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
+    <Page Include="Pages\ChooseLevelPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\GamePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -100,6 +111,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Pages\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\WinPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
