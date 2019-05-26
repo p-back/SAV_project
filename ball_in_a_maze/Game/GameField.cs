@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ball_in_a_maze
 {
-    class GameField
+    public class GameField
     {
         //   ------------- W / X --------------
         //   -                                -

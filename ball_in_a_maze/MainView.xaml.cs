@@ -24,8 +24,5 @@ namespace ball_in_a_maze
         {
             InitializeComponent();
         }
-
-        public event EventHandler ConnectionEstablished;
-
     }
 }

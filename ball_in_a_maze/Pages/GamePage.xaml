@@ -5,10 +5,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ball_in_a_maze"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="600"
       Title="GamePage">
 
     <Grid>
-        <Label>HALLLO</Label>
+        <Grid x:Name="gridGame"></Grid>
+        <Canvas>
+            <Ellipse x:Name="ellBall" Canvas.Left="{Binding Ball_X}" Canvas.Top="{Binding Ball_Y}" Fill="Gold" Stroke="Black" StrokeThickness="1"></Ellipse>
+        </Canvas>
     </Grid>
+
 </Page>

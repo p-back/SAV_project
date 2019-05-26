@@ -62,7 +62,8 @@ namespace ball_in_a_maze
         public string[] COMPorts
         {
             get { return activeCOMPorts.Ports; }
-            set {
+            set
+            {
                 OnPropertyChanged("COMPorts");
             }
         }
@@ -109,7 +110,7 @@ namespace ball_in_a_maze
         }
         private void OnGameFieldHasChanged(object sender, EventArgs e)
         {
-            GamePage.LoadGameField(theGame.Field);
+            gamePage.LoadGameField(theGame.Field);
         }
         private void OnBallIsInFinish(object sender, EventArgs e)
         {
