@@ -73,6 +73,7 @@
     <Compile Include="ActiveCOMPorts.cs" />
     <Compile Include="Game\GameField.cs" />
     <Compile Include="Levels\LevelBase.cs" />
+    <Compile Include="Levels\LevelBeginner.cs" />
     <Compile Include="Pages\ChooseLevelPage.xaml.cs">
       <DependentUpon>ChooseLevelPage.xaml</DependentUpon>
     </Compile>
@@ -82,6 +83,9 @@
     <Compile Include="Levels\LevelTraining.cs" />
     <Compile Include="Game\MotionData.cs" />
     <Compile Include="Pages\GridIndexToPixelConverter.cs" />
+    <Compile Include="Pages\LosePage.xaml.cs">
+      <DependentUpon>LosePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
@@ -110,6 +114,10 @@
       <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\LosePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\StartPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -15,7 +15,7 @@
             <ColumnDefinition Width="35*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         
-        <Grid Grid.Column="0" Height="600" Width="600" x:Name="gridGame"></Grid>
+        <Grid Grid.Column="0" Height="600" Width="600" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="gridGame"></Grid>
         <Canvas Grid.Column="0">
             <Ellipse x:Name="ellBall" Fill="Gold" Stroke="Black"></Ellipse>
         </Canvas>
