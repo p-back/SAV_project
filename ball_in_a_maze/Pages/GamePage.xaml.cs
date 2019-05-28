@@ -118,15 +118,13 @@ namespace ball_in_a_maze
             ellBall.Width = gridGame.Width / Field.Width * 3 / 4;
 
             // set ball dimension for collision detecting and trigger event
-            Dimensions[Dimensions.Length].Height = ellBall.Height / (gridGame.Height / Field.Height);
-            Dimensions[Dimensions.Length].Width =  ellBall.Width  / (gridGame.Width / Field.Width);
-            NewDimensionsAvailable?.Invoke(this, EventArgs.Empty);
+            Dimensions[Dimensions.Length - 1].Height = ellBall.Height / (gridGame.Height / Field.Height);
+            Dimensions[Dimensions.Length - 1].Width =  ellBall.Width  / (gridGame.Width / Field.Width);
         }
 
         public event EventHandler ResetGame;
         public event EventHandler CloseGame;
         public event EventHandler ChooseAnotherLevel;
-        public event EventHandler NewDimensionsAvailable;
 
         private void btnResetGame_Click(object sender, RoutedEventArgs e)
         {

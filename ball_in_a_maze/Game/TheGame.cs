@@ -16,11 +16,6 @@ namespace ball_in_a_maze
         public MotionData Data { get; private set; }
         public GameField Field { get; private set; }
         public bool GameEnabled { get; set; }
-        public double Border_H { get; set; }
-        public double Border_W { get; set; }
-        public double Hole_Radius { get; set; }
-        public double Finish_Radius { get; set; }
-        public double Ball_Radius { get; set; }
 
         public struct Dimension
         {
@@ -67,8 +62,8 @@ namespace ball_in_a_maze
             Field.PlayField             = PlayField;
             Field.Width                 = Width;
             Field.Height                = Height;
-            Field.BallPosition_X_W      = StartPositionX;
-            Field.BallPosition_Y_H      = StartPositionY;
+            Field.BallPosition_X_W      = 1;
+            Field.BallPosition_Y_H      = 1;
 
             // Infom ViewModel that GameField has changed
             GameFieldHasChanged?.Invoke(this, EventArgs.Empty);
@@ -107,7 +102,7 @@ namespace ball_in_a_maze
             Data = new MotionData();
 
             // create a dimension for every type of object (+1 for the ball which is not part of thy enum)
-            Dimensions = new Dimension[Enum.GetValues(typeof(GameField.GameElements)).Length +1];
+            Dimensions = new Dimension[Enum.GetValues(typeof(GameField.GameElements)).Length + 1];
 
             // Disable Game --> Reset State
             GameEnabled = false;
@@ -169,10 +164,10 @@ namespace ball_in_a_maze
             move_y = -move_y;
 
             // Prevent ball from hitting border
-            var t1 = Field.BallPosition_X_W + move_x;
-            var t2 = Field.BallPosition_Y_H + move_y;
-            idx_x = (int)Math.Round(t1, 0);
-            idx_y = (int)Math.Round(t2, 0);
+            var new_pos_x = Field.BallPosition_X_W + move_x;
+            var new_pos_y = Field.BallPosition_Y_H + move_y;
+            idx_x = (int)Math.Round(new_pos_x, 0);
+            idx_y = (int)Math.Round(new_pos_y, 0);
 
             if ((idx_x < 0) || (idx_y < 0) || (idx_x >= Field.Width) || (idx_y >= Field.Height))
                 return false;
@@ -185,11 +180,172 @@ namespace ball_in_a_maze
         /// </summary>
         private void SetBallPosition()
         {
-            if(!CalcIdx_out_of_Motion())
+            //if(!CalcIdx_out_of_Motion())
+            //    return;
+
+            // Calculate movement of ball
+            int Diff_X = Old_Value_X + Data.Axis_X;
+            int Diff_Y = Old_Value_Y + Data.Axis_Y;
+
+            // Save new values
+            Old_Value_X = Data.Axis_X;
+            Old_Value_Y = Data.Axis_Y;
+
+            move_x = Diff_X / 5000.0;
+            move_x = Math.Round(move_x, 1);
+            move_x = -move_x;
+            move_y = Diff_Y / 5000.0;
+            move_y = Math.Round(move_y, 1);
+            move_y = -move_y;
+
+            if (move_x >= 1)
+            {
+                move_x = 1;
+            }
+            else if(move_x <= -1)
+            {
+                move_x = -1;
+            }
+
+            if (move_y >= 1)
+            {
+                move_y = 1;
+            }
+            else if (move_y <= -1)
+            {
+                move_y = -1;
+            }
+
+            // Prevent ball from hitting obstacle (border)
+            var new_pos_x = Field.BallPosition_X_W + move_x;
+            var new_pos_y = Field.BallPosition_Y_H + move_y;
+
+            idx_x = (int)Math.Round(new_pos_x, 0);
+            idx_y = (int)Math.Round(new_pos_y, 0);
+
+            if ((idx_x < 0) || (idx_y < 0) || (idx_x >= Field.Width) || (idx_y >= Field.Height) ||
+                (idx_x - 1 < 0) || (idx_y - 1 < 0) || (idx_x + 1 >= Field.Width) || (idx_y + 1 >= Field.Height))
                 return;
 
-            if (Field.PlayField[idx_x, idx_x] == GameField.GameElements.Border)
+            // Get obstacle next to ball
+            GameField.GameElements next_element_x = GameField.GameElements.Border;
+            GameField.GameElements next_element_y = GameField.GameElements.Border;
+            var pos_elem_x = 0.0;
+            var pos_elem_y = 0.0;
+
+            if (move_x < 0)
+            {
+                next_element_x = Field.PlayField[idx_x - 1, idx_y];
+                pos_elem_x = idx_x - 1;
+            }
+            else
+            {
+                next_element_x = Field.PlayField[idx_x + 1, idx_y];
+                pos_elem_x = idx_x + 1;
+            }
+                
+            if (move_y < 0)
+            {
+                next_element_y = Field.PlayField[idx_x, idx_y - 1];
+                pos_elem_y = idx_y - 1;
+            }  
+            else
+            {
+                next_element_y = Field.PlayField[idx_x, idx_y + 1];
+                pos_elem_y = idx_y + 1;
+            } 
+
+            if (next_element_x == GameField.GameElements.Border)
+            {
+                // Calc Distance
+                var dist = Math.Abs(new_pos_x - pos_elem_x);
+
+                var radius_obstacle = Dimensions[(int)next_element_x].Width / 2;
+                var radius_ball = Dimensions[Dimensions.Length - 1].Width / 2;
+                var minimum = radius_ball + radius_obstacle;
+
+                if (dist < minimum)
+                {
+                    if (move_x < 0)
+                    {
+                        Field.BallPosition_X_W = pos_elem_x + minimum;
+                    }
+                    else
+                    {
+                        Field.BallPosition_X_W = pos_elem_x - minimum;
+                    }
+
+                    // Trigger Event --> inform ViewModel that Ball Position has changed
+                    BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+            }
+
+            if (next_element_y == GameField.GameElements.Border)
+            {
+                // Calc Distance
+                var dist = Math.Abs(new_pos_y - pos_elem_y);
+
+                var radius_obstacle = Dimensions[(int)next_element_y].Width / 2;
+                var radius_ball = Dimensions[Dimensions.Length - 1].Width / 2;
+                var minimum = radius_ball + radius_obstacle;
+
+                if (dist < minimum)
+                {
+                    if (move_y < 0)
+                    {
+                        Field.BallPosition_Y_H = pos_elem_y + minimum;
+                    }
+                    else
+                    {
+                        Field.BallPosition_Y_H = pos_elem_y - minimum;
+                    }
+
+                    // Trigger Event --> inform ViewModel that Ball Position has changed
+                    BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+            }
+
+            /*
+            double corr_pos_x = 0.0;
+            double corr_pos_y = 0.0;
+
+            if (move_x < 0)
+            {
+                // Corrected Position is the calculated new position and depending on the direction -->
+                // -/+ the radius of the ball and -/+ the radius of the border
+                corr_pos_x = new_pos_x - 
+                            (Dimensions[Dimensions.Length - 1].Width / 2) + 
+                            (Dimensions[(int)GameField.GameElements.Border].Width / 2);
+            }
+            else
+            {
+                corr_pos_x = new_pos_x + (Dimensions[Dimensions.Length - 1].Width / Field.Width / 2) - (Dimensions[(int)GameField.GameElements.Border].Width / Field.Width / 2);
+            }
+
+            if (move_y < 0)
+            {
+                corr_pos_y = new_pos_y - (Dimensions[Dimensions.Length - 1].Height / Field.Height / 2) + (Dimensions[(int)GameField.GameElements.Border].Height / Field.Height / 2);
+            }
+            else
+            {
+                corr_pos_y = new_pos_y + (Dimensions[Dimensions.Length - 1].Height / Field.Height / 2) - (Dimensions[(int)GameField.GameElements.Border].Height / Field.Height / 2);
+            }
+
+            idx_x = (int)Math.Round(corr_pos_x, 0);
+            idx_y = (int)Math.Round(corr_pos_y, 0);
+
+            //idx_x = (int)Math.Ceiling(corr_pos_x);
+            //idx_y = (int)Math.Ceiling(corr_pos_y);
+
+            if ((idx_x < 0) || (idx_y < 0) || (idx_x >= Field.Width) || (idx_y >= Field.Height))
                 return;
+
+            // TODO: instead of doing nothing --> ball must "touch" border
+            if (Field.PlayField[idx_x, idx_y] == GameField.GameElements.Border)
+                return;
+                */
 
             // Move Ball
             Field.BallPosition_X_W += move_x;

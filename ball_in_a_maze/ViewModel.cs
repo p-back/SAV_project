@@ -59,7 +59,6 @@ namespace ball_in_a_maze
             gamePage.ResetGame                      += OnResetGame;
             gamePage.ChooseAnotherLevel             += OnChooseAnotherLevel;
             gamePage.CloseGame                      += CloseGame;
-            gamePage.NewDimensionsAvailable         += OnNewDimensionsAvailable;
             chooseLevelPage.LevelTrainingSelected   += OnLevelTrainingSelected;
             chooseLevelPage.LevelBeginnerSelected   += OnLevelBeginnerSelected;
             chooseLevelPage.LevelAdvancedSelected   += OnLevelAdvancedSelected;
@@ -118,28 +117,18 @@ namespace ball_in_a_maze
         {
             //load the training level
             theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
-            SetSizes();
-        }
-
-        public void SetSizes()
-        {
-            theGame.Border_W = gamePage.gridGame.Width / (double)theGame.Field.Width;
-            theGame.Border_H = gamePage.gridGame.Height / (double)theGame.Field.Height;
-            theGame.Ball_Radius = gamePage.ellBall.Width;
         }
 
         private void OnLevelBeginnerSelected(object sender, EventArgs e)
         {
             //load the training level
             theGame.LoadNewField(levelBeginner.Level, levelBeginner.Width, levelBeginner.Height);
-            SetSizes();
         }
 
         private void OnLevelTrainingSelected(object sender, EventArgs e)
         {
             //load the training level
             theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
-            SetSizes();
         }
         private void CloseGame(object sender, EventArgs e)
         {
@@ -163,11 +152,6 @@ namespace ball_in_a_maze
             ChangeToPage(gamePage);
             theGame.ResetGame();
             theGame.GameEnabled = true;
-        }
-
-        private void OnNewDimensionsAvailable(object sender, EventArgs e)
-        {
-            
         }
 
         private void OnWindowClosing(object sender, EventArgs e)
