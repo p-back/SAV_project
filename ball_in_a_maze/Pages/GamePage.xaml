@@ -14,10 +14,13 @@
             <ColumnDefinition Width="65*"></ColumnDefinition>
             <ColumnDefinition Width="35*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        
+
         <Grid Grid.Column="0" Height="600" Width="600" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="gridGame"></Grid>
-        <Canvas Grid.Column="0">
-            <Ellipse x:Name="ellBall" Fill="Gold" Stroke="Black"></Ellipse>
+        <Canvas Name="canvLayer" Grid.Column="0" Background="Gray">
+            <Ellipse x:Name="ellBall" Fill="Gold" Stroke="Black" Visibility="Hidden"></Ellipse>
+            <Label x:Name="lblCalibrating" HorizontalAlignment="Center" VerticalContentAlignment="Center" FontSize="100" Foreground="White" Height="150" Canvas.Left="54" Canvas.Top="216">
+                Calibrating...
+            </Label>
         </Canvas>
 
         <Grid Grid.Column="1">

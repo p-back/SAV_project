@@ -18,46 +18,46 @@ namespace ball_in_a_maze
             Level = new GameField.GameElements[Height, Width];
 
             // for better visibility
-            char[] arr = new char[height * width]{
-                '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 
-                '*', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', '*', '*', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', 'O', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', '*', '*', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', 'O', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', '*', '*', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'F', '*', 
-                '*', '*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', '*', '*', '*', '*', 
-                '*', ' ', ' ', 'O', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', ' ', 'O', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', 
-                '*', 'O', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*',
-                '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'
+            char[][] arr = new char[height][] {
+                ("********************").ToCharArray(),
+                ("*      O**        F*").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**  ***    *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*      O**         *").ToCharArray(),
+                ("*                  *").ToCharArray(),
+                ("********************").ToCharArray()
             };
 
             // convert this array to the right type
-            for (int i = 0; i < Height*Width; i++)
+            for (int i = 0; i < Height; i++)
             {
-                GameField.GameElements elem = new GameField.GameElements();
-                if (arr[i] == ' ')
-                    elem = GameField.GameElements.Empty;
-                else if (arr[i] == '*')
-                    elem = GameField.GameElements.Border;
-                else if (arr[i] == 'O')
-                    elem = GameField.GameElements.Hole;
-                else if (arr[i] == 'F')
-                    elem = GameField.GameElements.Finish;
+                for (int j = 0; j < Width; j++)
+                {
+                    GameField.GameElements elem = new GameField.GameElements();
+                    if (arr[i][j] == ' ')
+                        elem = GameField.GameElements.Empty;
+                    else if (arr[i][j] == '*')
+                        elem = GameField.GameElements.Border;
+                    else if (arr[i][j] == 'O')
+                        elem = GameField.GameElements.Hole;
+                    else if (arr[i][j] == 'F')
+                        elem = GameField.GameElements.Finish;
 
-                int w = i % Width;
-                int h = i / Width;
-
-                Level[w, h] = elem;
+                    Level[j, i] = elem;
+                }
             }
         } 
     }

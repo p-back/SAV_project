@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace ball_in_a_maze 
@@ -44,6 +45,7 @@ namespace ball_in_a_maze
             theGame.Data.StartUpSuccessfull     += OnStartUpSuccessfull;
             theGame.Data.StartUpFailed          += OnStartUpFailed;
             theGame.Data.DataError              += OnDataError;
+            theGame.BoardIsCalibrated           += OnBoardIsCalibrated;
 
             // create the pages 
             startPage =         new StartPage();
@@ -138,17 +140,21 @@ namespace ball_in_a_maze
 
         private void OnChooseAnotherLevel(object sender, EventArgs e)
         {
+            gamePage.ResetGameForCalibration();
+            theGame.ResetGame();
             ChangeToPage(chooseLevelPage);
         }
 
         private void OnResetGame(object sender, EventArgs e)
         {
+            gamePage.ResetGameForCalibration();
             theGame.ResetGame();
             theGame.GameEnabled = true;
         }
 
         private void OnRetryLevel(object sender, EventArgs e)
         {
+            gamePage.ResetGameForCalibration();
             ChangeToPage(gamePage);
             theGame.ResetGame();
             theGame.GameEnabled = true;
@@ -228,6 +234,14 @@ namespace ball_in_a_maze
         {
             // startup was succesfull we can switch to the choose level page
             ChangeToPage(chooseLevelPage);
+        }
+
+        private void OnBoardIsCalibrated(object sender, EventArgs e)
+        {
+            mainView.Dispatcher.Invoke(() =>
+            {
+                gamePage.StartGame();
+            });
         }
 
         // --------------------------------------------------

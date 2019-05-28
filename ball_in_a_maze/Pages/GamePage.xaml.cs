@@ -73,8 +73,8 @@ namespace ball_in_a_maze
                         Grid.SetRow(rec, j);
                         gridGame.Children.Add(rec);
                         // set the dimension
-                        Dimensions[(int)GameField.GameElements.Border].Height = (gridGame.Height / Field.Height - RecMargin) / (gridGame.Height / Field.Height);
-                        Dimensions[(int)GameField.GameElements.Border].Width  = (gridGame.Width / Field.Width   - RecMargin) / (gridGame.Width / Field.Width);
+                        Dimensions[(int)GameField.GameElements.Border].Height = (gridGame.Height / Field.Height) / (gridGame.Height / Field.Height);
+                        Dimensions[(int)GameField.GameElements.Border].Width  = (gridGame.Width / Field.Width) / (gridGame.Width / Field.Width);
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Hole)
                     {
@@ -139,6 +139,20 @@ namespace ball_in_a_maze
         private void btnCloseGame_Click(object sender, RoutedEventArgs e)
         {
             CloseGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void StartGame()
+        {
+            canvLayer.Background = Brushes.Transparent;
+            ellBall.Visibility = Visibility.Visible;
+            lblCalibrating.Visibility = Visibility.Hidden;
+        }
+
+        public void ResetGameForCalibration()
+        {
+            canvLayer.Background = Brushes.Gray;
+            ellBall.Visibility = Visibility.Hidden;
+            lblCalibrating.Visibility = Visibility.Visible;
         }
     }
 }
