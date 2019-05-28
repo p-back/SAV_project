@@ -73,8 +73,8 @@ namespace ball_in_a_maze
                         Grid.SetRow(rec, j);
                         gridGame.Children.Add(rec);
                         // set the dimension
-                        Dimensions[(int)GameField.GameElements.Border].Height = (int)gridGame.Height / Field.Height - RecMargin;
-                        Dimensions[(int)GameField.GameElements.Border].Width = (int)gridGame.Width / Field.Width - RecMargin;
+                        Dimensions[(int)GameField.GameElements.Border].Height = (gridGame.Height / Field.Height - RecMargin) / (gridGame.Height / Field.Height);
+                        Dimensions[(int)GameField.GameElements.Border].Width  = (gridGame.Width / Field.Width   - RecMargin) / (gridGame.Width / Field.Width);
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Hole)
                     {
@@ -85,8 +85,8 @@ namespace ball_in_a_maze
                         Grid.SetColumn(ell, i);
                         Grid.SetRow(ell, j);
                         gridGame.Children.Add(ell);
-                        Dimensions[(int)GameField.GameElements.Hole].Height = (int)gridGame.Height / Field.Height;
-                        Dimensions[(int)GameField.GameElements.Hole].Width = (int)gridGame.Width / Field.Width;
+                        Dimensions[(int)GameField.GameElements.Hole].Height = (gridGame.Height / Field.Height) / (gridGame.Height / Field.Height);
+                        Dimensions[(int)GameField.GameElements.Hole].Width  = (gridGame.Width / Field.Width) / (gridGame.Width / Field.Width);
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Finish)
                     {
@@ -97,14 +97,14 @@ namespace ball_in_a_maze
                         Grid.SetColumn(ell, i);
                         Grid.SetRow(ell, j);
                         gridGame.Children.Add(ell);
-                        Dimensions[(int)GameField.GameElements.Finish].Height = (int)gridGame.Height / Field.Height;
-                        Dimensions[(int)GameField.GameElements.Finish].Width = (int)gridGame.Width / Field.Width;
+                        Dimensions[(int)GameField.GameElements.Finish].Height = (gridGame.Height / Field.Height) / (gridGame.Height / Field.Height);
+                        Dimensions[(int)GameField.GameElements.Finish].Width = (gridGame.Width / Field.Width) / (gridGame.Width / Field.Width);
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Empty)
                     {
                         // nothing to do here...
-                        Dimensions[(int)GameField.GameElements.Empty].Height = (int)gridGame.Height / Field.Height;
-                        Dimensions[(int)GameField.GameElements.Empty].Width = (int)gridGame.Width / Field.Width;
+                        Dimensions[(int)GameField.GameElements.Empty].Height = (gridGame.Height / Field.Height) / (gridGame.Height / Field.Height);
+                        Dimensions[(int)GameField.GameElements.Empty].Width = (gridGame.Width / Field.Width) / (gridGame.Width / Field.Width);
                     }
                 }
             }
@@ -118,8 +118,8 @@ namespace ball_in_a_maze
             ellBall.Width = gridGame.Width / Field.Width * 3 / 4;
 
             // set ball dimension for collision detecting and trigger event
-            Dimensions[Dimensions.Length].Height = (int)ellBall.Height;
-            Dimensions[Dimensions.Length].Width = (int)ellBall.Width;
+            Dimensions[Dimensions.Length].Height = ellBall.Height / (gridGame.Height / Field.Height);
+            Dimensions[Dimensions.Length].Width =  ellBall.Width  / (gridGame.Width / Field.Width);
             NewDimensionsAvailable?.Invoke(this, EventArgs.Empty);
         }
 

@@ -47,7 +47,7 @@ namespace ball_in_a_maze
 
             // create the pages 
             startPage =         new StartPage();
-            gamePage =          new GamePage(Enum.GetValues(typeof(GameField.GameElements)).Length);
+            gamePage =          new GamePage();
             chooseLevelPage =   new ChooseLevelPage();
             winPage =           new WinPage();
             losePage =          new LosePage();

@@ -24,8 +24,8 @@ namespace ball_in_a_maze
 
         public struct Dimension
         {
-            public int Height;
-            public int Width;
+            public double Height;
+            public double Width;
         };
         public Dimension[] Dimensions { get; set; }
 
