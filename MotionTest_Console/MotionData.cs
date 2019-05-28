@@ -35,6 +35,8 @@ namespace BallInAMaze
 
         private Timer timer;
 
+        private int test;
+
         /// <summary>
         /// CTOR
         /// </summary>
