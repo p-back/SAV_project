@@ -16,7 +16,13 @@ namespace ball_in_a_maze
         //   -                                -
         //   -                                -
         //   ------------- W / X --------------
-        public enum GameElements { Border, Empty, Hole, Finish };
+        public enum GameElements
+        {
+            Border  = 0,
+            Empty   = 1,
+            Hole    = 2,
+            Finish  = 3
+        };
         public GameElements[,] PlayField { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ball_in_a_maze
 {
-    class TheGame
+    public class TheGame
     {
         // --------------------------------------------------
         //                  PROPERTIES
@@ -21,6 +21,13 @@ namespace ball_in_a_maze
         public double Hole_Radius { get; set; }
         public double Finish_Radius { get; set; }
         public double Ball_Radius { get; set; }
+
+        public struct Dimension
+        {
+            public int Height;
+            public int Width;
+        };
+        public Dimension[] Dimensions { get; set; }
 
         // --------------------------------------------------
         //                  EVENTS
@@ -98,6 +105,9 @@ namespace ball_in_a_maze
         {
             Field = new GameField();
             Data = new MotionData();
+
+            // create a dimension for every type of object (+1 for the ball which is not part of thy enum)
+            Dimensions = new Dimension[Enum.GetValues(typeof(GameField.GameElements)).Length +1];
 
             // Disable Game --> Reset State
             GameEnabled = false;

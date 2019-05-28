@@ -47,7 +47,7 @@ namespace ball_in_a_maze
 
             // create the pages 
             startPage =         new StartPage();
-            gamePage =          new GamePage();
+            gamePage =          new GamePage(Enum.GetValues(typeof(GameField.GameElements)).Length);
             chooseLevelPage =   new ChooseLevelPage();
             winPage =           new WinPage();
             losePage =          new LosePage();
@@ -59,6 +59,7 @@ namespace ball_in_a_maze
             gamePage.ResetGame                      += OnResetGame;
             gamePage.ChooseAnotherLevel             += OnChooseAnotherLevel;
             gamePage.CloseGame                      += CloseGame;
+            gamePage.NewDimensionsAvailable         += OnNewDimensionsAvailable;
             chooseLevelPage.LevelTrainingSelected   += OnLevelTrainingSelected;
             chooseLevelPage.LevelBeginnerSelected   += OnLevelBeginnerSelected;
             chooseLevelPage.LevelAdvancedSelected   += OnLevelAdvancedSelected;
@@ -71,11 +72,6 @@ namespace ball_in_a_maze
 
             // load the start page
             ChangeToPage(startPage);
-        }
-
-        private void OnWindowClosing(object sender, EventArgs e)
-        {
-            theGame.Data.ClosePort();
         }
 
         // --------------------------------------------------
@@ -106,8 +102,6 @@ namespace ball_in_a_maze
                 OnPropertyChanged("Ball_Y");
             }
         }
-
-
         // --------------------------------------------------
         //       FUNCTIONS BEHIND EVENTS FROM UI
         // --------------------------------------------------
@@ -131,8 +125,6 @@ namespace ball_in_a_maze
         {
             theGame.Border_W = gamePage.gridGame.Width / (double)theGame.Field.Width;
             theGame.Border_H = gamePage.gridGame.Height / (double)theGame.Field.Height;
-            theGame.Hole_Radius = gamePage.Hole_Radius;
-            theGame.Finish_Radius = gamePage.Finish_Radius;
             theGame.Ball_Radius = gamePage.ellBall.Width;
         }
 
@@ -165,11 +157,22 @@ namespace ball_in_a_maze
             theGame.ResetGame();
             theGame.GameEnabled = true;
         }
+
         private void OnRetryLevel(object sender, EventArgs e)
         {
             ChangeToPage(gamePage);
             theGame.ResetGame();
             theGame.GameEnabled = true;
+        }
+
+        private void OnNewDimensionsAvailable(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void OnWindowClosing(object sender, EventArgs e)
+        {
+            theGame.Data.ClosePort();
         }
 
         // --------------------------------------------------
@@ -184,7 +187,7 @@ namespace ball_in_a_maze
         private void OnGameFieldHasChanged(object sender, EventArgs e)
         {
             // load the game into the page before loading the page
-            gamePage.LoadGameField(theGame.Field);
+            gamePage.LoadGameField(theGame.Field, theGame.Dimensions);
             ChangeToPage(gamePage);
             // enable game
             theGame.GameEnabled = true;
