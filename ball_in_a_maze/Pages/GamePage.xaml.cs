@@ -35,6 +35,9 @@ namespace ball_in_a_maze
             ell.SetBinding(prop, bind);
         }
 
+        public double Hole_Radius { get; set; }
+        public double Finish_Radius { get; set; }
+
         /// <summary>
         /// the class GamePage has one grid as top level object 
         /// there are a grid and a canvas in it
@@ -81,6 +84,7 @@ namespace ball_in_a_maze
                         Grid.SetColumn(ell, i);
                         Grid.SetRow(ell, j);
                         gridGame.Children.Add(ell);
+                        Hole_Radius = ell.ActualWidth;
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Finish)
                     {
@@ -91,6 +95,7 @@ namespace ball_in_a_maze
                         Grid.SetColumn(ell, i);
                         Grid.SetRow(ell, j);
                         gridGame.Children.Add(ell);
+                        Finish_Radius = ell.ActualWidth;
                     }
                     else if (Field.PlayField[i, j] == GameField.GameElements.Empty)
                     {

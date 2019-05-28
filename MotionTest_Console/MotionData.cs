@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace BallInAMaze
 {
@@ -31,6 +32,8 @@ namespace BallInAMaze
 
         // Start Condition that is sent to Board at startup
         private readonly byte[] StartCondition = new byte[2] { 0xAF, 0xFE };
+
+        private Timer timer;
 
         /// <summary>
         /// CTOR
@@ -96,6 +99,18 @@ namespace BallInAMaze
                 StartUpFailed?.Invoke(this, EventArgs.Empty);
                 return;
             }
+
+            timer = new Timer();
+            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            timer.Interval = 5000; // 1 sec
+            timer.Enabled = true;
+            timer.AutoReset = false;
+        }
+
+        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        {
+            byte[] stop = { 0x01 };
+            mPort.Write(stop, 0, 1);
         }
 
         // THIS method can be exchanged if we are not longer

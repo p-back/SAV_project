@@ -27,6 +27,9 @@
 // to be used to BLOCK wait for UART data
 #define UART_RECV_BYTE()		XUartPs_RecvByte(XPAR_PS7_UART_1_BASEADDR)
 
+// to be used to clear RECV buffer of UART
+#define UART_CLEAR_RECV_BUF()	XUartPs_WriteReg(XPAR_PS7_UART_1_BASEADDR, XUARTPS_CR_OFFSET, (u32)XUARTPS_CR_RXRST);
+
 // START condition to be recieved from APPLICATION
 #define START_CONDITION			0xAFFE
 
@@ -53,8 +56,22 @@ int main()
     LIS2DS12_Init();
 
 START:
+	// Discard all DATA in RECEIVE BUFFER
+    UART_CLEAR_RECV_BUF();
+
     // STARTUP PHASE --> ***BLOCKING*** until start condition is received
-    if(StartUp_Phase() != SUCCESS) return FAILURE;
+    if(StartUp_Phase() != SUCCESS)
+    {
+    	// While USER has NOT pressed RESET button --> wake up every 100 ms and check
+		while(!GPIO_Get_PS_Button())
+		{
+			// Send data every 100 ms (10 times in a second)
+			usleep(100000);
+		}
+
+		// Then go back to START
+		goto START;
+    }
 
     // Prevent PROGRAM from EXITING
     while(1)
@@ -62,6 +79,23 @@ START:
     	if (GPIO_Get_PS_Button())
     	{
     		goto START;
+    	}
+
+    	// Check if Application sent command ...
+    	if(XUartPs_IsReceiveData(XPAR_PS7_UART_1_BASEADDR))
+    	{
+    		// DECODE COMMAND
+    		switch(UART_RECV_BYTE())
+    		{
+    		case 0x01:
+    			// STOP COMMAND --> go to START
+    			goto START;
+    		case 0x02:
+    			break;
+    		default:
+    			// Unknown COMMAND
+    			break;
+    		}
     	}
 
 		// Read and Print Motion values

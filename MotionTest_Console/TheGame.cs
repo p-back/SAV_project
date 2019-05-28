@@ -98,7 +98,20 @@ namespace BallInAMaze
 
         private void Data_NewDataArrived(object sender, EventArgs e)
         {
-            Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
+            // Calculate movement of ball
+            int Diff_X = Old_Value_X + data.Axis_X;
+            int Diff_Y = Old_Value_Y + data.Axis_Y;
+
+            double move_x = Diff_X / 5000.0;
+            move_x = Math.Round(move_x, 1);
+            double move_y = Diff_Y / 5000.0;
+            move_y = Math.Round(move_y, 1);
+
+            // Save new values
+            Old_Value_X = data.Axis_X;
+            Old_Value_Y = data.Axis_Y;
+
+            Console.WriteLine("X: {0} Y: {1} Z: {2}", move_x.ToString().PadRight(8), move_y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
 
             // Kalibrierung nach StartUp
             // SetBallPosition + Überprüfung + Event an ModelView wenn Kugel in Loch oder Kugel in Ziel

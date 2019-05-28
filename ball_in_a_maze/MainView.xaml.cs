@@ -20,9 +20,17 @@ namespace ball_in_a_maze
     /// </summary>
     public partial class MainView : Window
     {
+        public EventHandler WindowClosing;
+
         public MainView()
         {
             InitializeComponent();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // If Application is closed used the RED X Button --> Inform ViewModel and Reset BOARD
+            WindowClosing?.Invoke(this, EventArgs.Empty);
         }
     }
 }

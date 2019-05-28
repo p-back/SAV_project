@@ -13,9 +13,14 @@ namespace ball_in_a_maze
         // --------------------------------------------------
         //                  PROPERTIES
         // --------------------------------------------------
-        public MotionData Data { get => data; private set => data = value; }
-        public GameField Field { get => field; private set => field = value; }
+        public MotionData Data { get; private set; }
+        public GameField Field { get; private set; }
         public bool GameEnabled { get; set; }
+        public double Border_H { get; set; }
+        public double Border_W { get; set; }
+        public double Hole_Radius { get; set; }
+        public double Finish_Radius { get; set; }
+        public double Ball_Radius { get; set; }
 
         // --------------------------------------------------
         //                  EVENTS
@@ -24,9 +29,10 @@ namespace ball_in_a_maze
         public event EventHandler BallIsInFinish;
         public event EventHandler BallPositionHasChanged;
         public event EventHandler GameFieldHasChanged;
+        public event EventHandler BoardIsCalibrated;
 
         // --------------------------------------------------
-        //                  MEMBERS
+        //                PRIVATE MEMBERS
         // --------------------------------------------------
 
         // Old values from motion board to be able to calculate difference in movement
@@ -36,61 +42,79 @@ namespace ball_in_a_maze
         // Flag to ensure that motion board is calibrated
         private bool IsCalibrated = false;
 
-        private GameField field;
-        private MotionData data;
+
+        // --------------------------------------------------
+        //               PUBLIC METHODS
+        // --------------------------------------------------
+
+        /// <summary>
+        /// Method that loads new PlayField with given parameter and triggers event
+        /// </summary>
+        /// <param name="PlayField">The PlayField to be loaded</param>
+        /// <param name="Width">Width of PlayField</param>
+        /// <param name="Height">Height of PlayField</param>
+        /// <param name="StartPositionX">X start position of Ball</param>
+        /// <param name="StartPositionY">Y start position of Ball</param>
+        public void LoadNewField(GameField.GameElements[,] PlayField, int Width, int Height, int StartPositionX = 1, int StartPositionY = 1)
+        {
+            Field.PlayField             = PlayField;
+            Field.Width                 = Width;
+            Field.Height                = Height;
+            Field.BallPosition_X_W      = StartPositionX;
+            Field.BallPosition_Y_H      = StartPositionY;
+
+            // Infom ViewModel that GameField has changed
+            GameFieldHasChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Method that RESETS the whole Game Logic
+        /// </summary>
+        public void ResetGame()
+        {
+            // Reset FLAGs
+            IsCalibrated = false;
+            GameEnabled = false;
+
+            // Reset Ball Position
+            Field.BallPosition_X_W = 1;
+            Field.BallPosition_Y_H = 1;
+            Old_Value_X = 0;
+            Old_Value_Y = 0;
+
+            idx_x = 0;
+            idx_y = 0;
+            move_x = 0.0;
+            move_y = 0.0;
+
+            // Trigger Event so ViewModel can actually reset ball Position
+            BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         // --------------------------------------------------
         //                      CTOR
         // --------------------------------------------------
         public TheGame()
         {
-            field = new GameField();
-            data = new MotionData();
+            Field = new GameField();
+            Data = new MotionData();
 
+            // Disable Game --> Reset State
             GameEnabled = false;
 
-            // TODO: remove this
-            Worker = new BackgroundWorker();
-            Worker.DoWork += OnWorkerDoWork;
-            Worker.RunWorkerAsync();
+            // Add Event that is called when new data has arrived from motion board
+            Data.NewDataAvailable += Data_NewDataArrived;
         }
-
-        public void ResetGame()
-        {
-            // TODO: reset ball position
-
-            // TODO: evtl kalibrieren
-        }
-
-        private void OnWorkerDoWork(object sender, DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                if (GameEnabled)
-                {
-                    while (field.BallPosition_X_W < 0.9*field.Width)
-                    {
-                        Field.BallPosition_X_W += 0.1;
-                        Field.BallPosition_Y_H += 0.1;
-                        BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
-                        Thread.Sleep(10);
-                    }
-                    while (field.BallPosition_X_W > 0.1 * field.Width)
-                    {
-                        Field.BallPosition_X_W -= 0.2;
-                        Field.BallPosition_Y_H -= 0.2;
-                        BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
-                        Thread.Sleep(10);
-                    }
-                }
-            }
-        }
-
-        public BackgroundWorker Worker { get; set; }
 
         // --------------------------------------------------
         //              IMPLEMENTED EVENTS
         // --------------------------------------------------
+
+        /// <summary>
+        /// Event Handler that is called by MotionData when new motion values are available
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Data_NewDataArrived(object sender, EventArgs e)
         {
             // DO NOTHING --> if Game is NOT enabled yet
@@ -104,26 +128,99 @@ namespace ball_in_a_maze
                 return;
             }
 
-            // If Game is ENABLED and Board is CALIBRATED --> handle motion data and set BALL POSITION
+            // Set NEW position of BALL
+            SetBallPosition();
+        }
 
-            //Console.WriteLine("X: {0} Y: {1} Z: {2}", data.Axis_X.ToString().PadRight(8), data.Axis_Y.ToString().PadRight(8), data.Axis_Z.ToString().PadRight(8));
+        // --------------------------------------------------
+        //              PRIVATE METHODS
+        // --------------------------------------------------
 
-            // Kalibrierung nach StartUp
-            // SetBallPosition + Überprüfung + Event an ModelView wenn Kugel in Loch oder Kugel in Ziel
+        private int idx_x = 0;
+        private int idx_y = 0;
+        private double move_x = 0;
+        private double move_y = 0;
 
-            // TODO before the following steps --> START UP / CALIBRATION phase
-            // As long as the values are not "near" to zero --> DO NOTHING
-            // That means, that at the beginning of the game, the player does not 
-            // grab the board right --> therefore --> wait until board is held is "normal" position
+        private bool CalcIdx_out_of_Motion()
+        {
+            // Calculate movement of ball
+            int Diff_X = Old_Value_X + Data.Axis_X;
+            int Diff_Y = Old_Value_Y + Data.Axis_Y;
 
-            // TODO: after START UP
-            // 1) Calculate difference between old values and new values --> and then calculate movement of ball
-            // 2) Check if Ball would hit wall --> prevent this
-            // 3) If ball is in hole --> trigger event to ViewModel
-            // 4) If ball is in finish --> trigger event to ViewModel
-            // 5) and evertime the position of the ball changes --> trigger "PositionHasChanged" for ViewModel
+            // Save new values
+            Old_Value_X = Data.Axis_X;
+            Old_Value_Y = Data.Axis_Y;
 
-            // Maybe some of these tasks could be integrated into the Model "GameField"
+            move_x = Diff_X / 5000.0;
+            move_x = Math.Round(move_x, 1);
+            move_x = -move_x;
+            move_y = Diff_Y / 5000.0;
+            move_y = Math.Round(move_y, 1);
+            move_y = -move_y;
+
+            // Prevent ball from hitting border
+            var t1 = Field.BallPosition_X_W + move_x;
+            var t2 = Field.BallPosition_Y_H + move_y;
+            idx_x = (int)Math.Round(t1, 0);
+            idx_y = (int)Math.Round(t2, 0);
+
+            if ((idx_x < 0) || (idx_y < 0) || (idx_x >= Field.Width) || (idx_y >= Field.Height))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Method that calculates and sets the new ball position depending on input motion values
+        /// </summary>
+        private void SetBallPosition()
+        {
+            if(!CalcIdx_out_of_Motion())
+                return;
+
+            if (Field.PlayField[idx_x, idx_x] == GameField.GameElements.Border)
+                return;
+
+            // Move Ball
+            Field.BallPosition_X_W += move_x;
+            Field.BallPosition_Y_H += move_y;
+
+            // If Ball is EITHER in HOLE or in FINISH --> no need to move it anymore --> Game is OVER
+            if (IsBallInHole() || IsBallInFinish())
+                return;
+
+            // Trigger Event --> inform ViewModel that Ball Position has changed
+            BallPositionHasChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Method that checks if Ball is in finish, and triggers EVENT
+        /// </summary>
+        /// <returns></returns>
+        private bool IsBallInFinish()
+        {
+            if (Field.PlayField[idx_x, idx_x] == GameField.GameElements.Finish)
+            {
+                BallIsInFinish?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Method that checks if BALL is in HOLE and triggers EVENT
+        /// </summary>
+        /// <returns></returns>
+        private bool IsBallInHole()
+        {
+            if(Field.PlayField[idx_x, idx_y] == GameField.GameElements.Hole)
+            {
+                BallIsInHole?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+
+            return false;
         }
 
         private void Calibrate()
@@ -132,26 +229,8 @@ namespace ball_in_a_maze
                 (Data.Axis_Y <= 150) && (Data.Axis_Y >= -150))
             {
                 IsCalibrated = true;
+                BoardIsCalibrated?.Invoke(this, EventArgs.Empty);
             }
-        }
-
-        // --------------------------------------------------
-        //                      METHODS
-        // --------------------------------------------------
-        public void LoadNewField(GameField.GameElements[,] PlayField, int Width, int Height, int StartPositionX = 1, int StartPositionY = 1)
-        {
-            Field.PlayField = PlayField;
-            Field.Width = Width;
-            Field.Height = Height;
-            Field.BallPosition_X_W = StartPositionX;
-            Field.BallPosition_Y_H = StartPositionY;
-            GameFieldHasChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void ResetGame()
-        {
-            Field.BallPosition_X_W = 1;
-            Field.BallPosition_Y_H = 1;
         }
     }
 }
