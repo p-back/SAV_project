@@ -35,6 +35,7 @@ namespace ball_in_a_maze
             // create the levels
             levelTraining = new LevelTraining();
             levelBeginner = new LevelBeginner();
+            levelAdvanced = new LevelAdvanced();
 
             // create the game and connect to events
             theGame = new TheGame();
@@ -118,7 +119,7 @@ namespace ball_in_a_maze
         private void OnLevelAdvancedSelected(object sender, EventArgs e)
         {
             //load the training level
-            theGame.LoadNewField(levelTraining.Level, levelTraining.Width, levelTraining.Height);
+            theGame.LoadNewField(levelAdvanced.Level, levelAdvanced.Width, levelAdvanced.Height);
         }
 
         private void OnLevelBeginnerSelected(object sender, EventArgs e)
@@ -253,6 +254,7 @@ namespace ball_in_a_maze
         // the levels
         private LevelTraining levelTraining { get; set; }
         private LevelBeginner levelBeginner{ get; set; }
+        private LevelAdvanced levelAdvanced{ get; set; }
 
         // the UI pages
         private StartPage startPage { get; set; }

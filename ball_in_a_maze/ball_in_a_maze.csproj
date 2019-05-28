@@ -72,6 +72,7 @@
     </ApplicationDefinition>
     <Compile Include="ActiveCOMPorts.cs" />
     <Compile Include="Game\GameField.cs" />
+    <Compile Include="Levels\LevelAdvanced.cs" />
     <Compile Include="Levels\LevelBase.cs" />
     <Compile Include="Levels\LevelBeginner.cs" />
     <Compile Include="Pages\ChooseLevelPage.xaml.cs">
